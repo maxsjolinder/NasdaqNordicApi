@@ -1,0 +1,13 @@
+language: csharp
+solution: NasdaqNordicApi.sln
+mono: none
+dotnet: 2.2.104
+script:
+ - dotnet build -c Release
+ - dotnet test NorthernLight.NasdaqNordic.Test/ -c Release
+deploy:
+ skip_cleanup: true
+ provider: script
+ script: bash upload_nuget.sh 
+ on:
+   branch: deploy_nuget
