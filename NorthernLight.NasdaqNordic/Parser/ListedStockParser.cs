@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace NorthernLight.NasdaqNordic.Parser
 {
@@ -110,13 +111,15 @@ namespace NorthernLight.NasdaqNordic.Parser
         private string GetFirstChildInnerText(string columnTitle, List<HtmlNode> columnValues)
         {
             var node = GetColumnNode(columnTitle, columnValues);
-            return node.ChildNodes.FirstOrDefault()?.InnerText ?? "";
+            var text = node.ChildNodes.FirstOrDefault()?.InnerText ?? "";
+            return HtmlDecode(text);
         }
 
         private string GetFirstChildsHrefAttributeValue(string columnTitle, List<HtmlNode> columnValues)
         {
             var node = GetColumnNode(columnTitle, columnValues);
-            return node.ChildNodes.FirstOrDefault()?.Attributes.FirstOrDefault(x => x.Name == "href")?.Value ?? "";
+            var text = node.ChildNodes.FirstOrDefault()?.Attributes.FirstOrDefault(x => x.Name == "href")?.Value ?? "";
+            return HtmlDecode(text);
         }
 
         private int GetDataColumnIndex(string columnTitle)
@@ -151,6 +154,11 @@ namespace NorthernLight.NasdaqNordic.Parser
             }
 
             return titleToIndexDict;
+        }
+
+        private string HtmlDecode(string str)
+        {
+            return HttpUtility.HtmlDecode(str);
         }
     }
 }
