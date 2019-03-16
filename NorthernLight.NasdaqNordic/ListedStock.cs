@@ -1,6 +1,6 @@
 ﻿namespace NorthernLight.NasdaqNordic
 {
-    public class ListedStock : IListedStock
+    internal class ListedStock : IListedStock
     {
         public string Name { get; set; }
 

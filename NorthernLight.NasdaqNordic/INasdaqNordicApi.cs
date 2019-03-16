@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NorthernLight.NasdaqNordic
 {
-    public interface INasdaqNordic
+    public interface INasdaqNordicApi
     {
         Task<IList<IListedStock>> GetListedStockholmStocksAsync();
     }

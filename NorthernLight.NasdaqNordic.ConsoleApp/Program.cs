@@ -9,7 +9,7 @@ namespace NorthernLight.NasdaqNordic.ConsoleApp
         public static async Task Main(string[] args)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            INasdaqNordic nasdaqApi = new NasdaqNordic();
+            INasdaqNordicApi nasdaqApi = new NasdaqNordicApi();
             var listedStocks = await nasdaqApi.GetListedStockholmStocksAsync();
             
             watch.Stop();
@@ -20,7 +20,7 @@ namespace NorthernLight.NasdaqNordic.ConsoleApp
             foreach (var listedStock in listedStocks.Where(x => x.Segment == Segment.Small))
             {
                 Console.WriteLine(listedStock.Name);
-            }
+            }                        
             Console.ReadLine();
         }
     }

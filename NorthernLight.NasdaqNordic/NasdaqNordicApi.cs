@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace NorthernLight.NasdaqNordic
 {
-    public class NasdaqNordic : INasdaqNordic
+    public class NasdaqNordicApi : INasdaqNordicApi
     {
         private readonly IListedStockParser listedStockParser;
         private readonly IStockDetailParser stockDetailParser;
 
-        public NasdaqNordic()
+        public NasdaqNordicApi()
         {
             stockDetailParser = new StockDetailParser(new HttpClient.HttpClient());
             listedStockParser = new ListedStockParser(new HttpClient.HttpClient(), stockDetailParser);
