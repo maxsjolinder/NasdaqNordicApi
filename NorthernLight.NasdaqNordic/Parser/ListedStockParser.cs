@@ -95,7 +95,7 @@ namespace NorthernLight.NasdaqNordic.Parser
                 Symbol = GetFirstChildInnerText("Symbol", columnValues),
                 Currency = GetFirstChildInnerText("Currency", columnValues),
                 ISIN = GetFirstChildInnerText("ISIN", columnValues),
-                Sector = GetFirstChildInnerText("Sector", columnValues),
+                Sector = GetFirstChildAttribute("Sector", "title", columnValues),
                 SectorCode = GetFirstChildInnerText("Sector Code", columnValues),
                 FactSheetUrl = GetFirstChildsHrefAttributeValue("Fact Sheet", columnValues),
                 NasdaqInstrumentId = ParserUtil.ParseNasdaqInstrumentIdFromUrlString(GetFirstChildsHrefAttributeValue("Name", columnValues))
@@ -112,6 +112,13 @@ namespace NorthernLight.NasdaqNordic.Parser
         {
             var node = GetColumnNode(columnTitle, columnValues);
             var text = node.ChildNodes.FirstOrDefault()?.InnerText ?? "";
+            return HtmlDecode(text);
+        }
+
+        private string GetFirstChildAttribute(string columnTitle, string attribute, List<HtmlNode> columnValues)
+        {
+            var node = GetColumnNode(columnTitle, columnValues);
+            var text = node.Attributes.FirstOrDefault(x => x.Name == attribute)?.Value ?? "";
             return HtmlDecode(text);
         }
 

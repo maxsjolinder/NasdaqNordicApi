@@ -17,7 +17,7 @@ namespace NorthernLight.NasdaqNordic.Parser
         {
             try
             {
-                string lists = jsonStockData["inst"]["@lists"];
+                string lists = jsonStockData["inst"]["@lists"]?.ToString() ?? "";
                 if (lists.Contains("Large Cap"))
                     return Segment.Large;
                 if (lists.Contains("Mid Cap"))
