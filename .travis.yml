@@ -1,8 +1,7 @@
 language: csharp
 solution: NasdaqNordicApi.sln
 mono: none
-dotnet: 2.2
-dist: xenial
+dotnet: 3.1
 script:
  - dotnet build -c Release
  - dotnet test NorthernLight.NasdaqNordic.Test/ -c Release
