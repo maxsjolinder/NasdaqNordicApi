@@ -35,13 +35,19 @@ namespace NorthernLight.NasdaqNordic.Parser
         {
             titleToTitleIndexDict = GetTitleToTitleIndexMappings(doc);
             var listedStockTableRows = GetListedCompaniesTableDataRows(doc);
-            return await ParseStockAndPopulateStockDetailsAsync(listedStockTableRows);
-        }
+            var listedStocks = await ParseStockAndPopulateStockDetailsAsync(listedStockTableRows);
 
-        private async Task<List<IListedStock>> ParseStockAndPopulateStockDetailsAsync(IEnumerable<HtmlNode> listedStockTableRows)
+            // There have been occurrences where the same ISIN is listed multiple times.
+            // Sometimes the data even differs (we consider this case an exception). 
+            EnsureUniqueIsins(listedStocks);
+
+            return listedStocks.ToList<IListedStock>();
+        }     
+
+        private async Task<List<ListedStock>> ParseStockAndPopulateStockDetailsAsync(IEnumerable<HtmlNode> listedStockTableRows)
         {
             // Use a semaphore to limit the number of concurrent network connections
-            var tasks = new List<Task<IListedStock>>();
+            var tasks = new List<Task<ListedStock>>();
             using (SemaphoreSlim semaphore = new SemaphoreSlim(MaxDegreeOfParallelism))
             {
                 foreach (var listedStockNode in listedStockTableRows)
@@ -53,7 +59,7 @@ namespace NorthernLight.NasdaqNordic.Parser
                         {
                             var stock = ParseStock(listedStockNode);
                             await PopulateStockDetailInformationAsync(stock);
-                            return stock as IListedStock;
+                            return stock;
                         }
                         finally
                         {
@@ -66,7 +72,19 @@ namespace NorthernLight.NasdaqNordic.Parser
                 await Task.WhenAll(tasks);
             }
 
-            return tasks.Select(x => x.Result).ToList();
+            return tasks.Select(x => x.Result).Distinct().ToList();
+        }
+
+        private void EnsureUniqueIsins(List<ListedStock> listedStock)
+        {
+            var duplicatedIsins = listedStock.GroupBy(x => x.ISIN)
+                .Where(g => g.Count() > 1)
+                .Select(x => x.Key);
+
+            if (duplicatedIsins.Any())
+            {
+                throw new ListedStockParserException($"There are multiple stocks with the same ISIN but different data. Affected ISINs: {string.Join(",", duplicatedIsins)}");
+            }
         }
 
         private static IEnumerable<HtmlNode> GetListedCompaniesTableDataRows(HtmlDocument doc)
